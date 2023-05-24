@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./css/style.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+  <!-- <button type="button" onclick="init()">Start</button> -->
+  <h2>AI가 알려주는, 나와 닮은 캐릭터는?</h2>
+  <p class="title">원여고 코데(CO;DE)동아리 과학 체험 부스</p>
+  <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 20px">
+    <img src="startimg/judy.jpeg" style="width:130px; height:130px">
+    <img src="startimg/sawako.jpeg" style="width:130px; height:130px">
+    <img src="startimg/squirtle.png" style="width:130px; height:130px">
+    <img src="startimg/jessi.png" style="width:130px; height:130px">
+    <img src="startimg/mymelody.png" style="width:130px; height:130px">
+    <img src="startimg/kuromi.png" style="width:130px; height:130px">
+    <img src="startimg/moomin.png" style="width:130px; height:130px">
+    <img src="startimg/misbarney.jpeg" style="width:130px; height:130px">
+    <img src="startimg/maruko.png" style="width:130px; height:130px">
+    <img src="startimg/ari.jpeg" style="width:130px; height:130px">
+  </div>
+  <p class="startname">주 디 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사와코 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;꼬북이 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;제 시 &nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;마이멜로디 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;쿠로미 &nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무 민 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;미스바니 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;마루코 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;아 리</p>
+
+  <!-- Upload  -->
+  <form id="file-upload-form" class="uploader">
+    <input id="file-upload" type="file" name="fileUpload" accept="image/*" />
+
+    <label for="file-upload" id="file-drag">
+      <img id="file-image" src="#" alt="Preview" class="hidden">
+      <div id="loading" class="animated bounce" style="display: none">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p class="loading-message">AI가 당신의 얼굴을 분석중입니다.</p>
+      </div>
+      <p class="result-message"></p> <!-- each result-message 사진이랑 같이 나오게 구현 -->
+      <div id="label-container" class="d-flex flex-column justify-content-around"></div>
+      <div id="start">
+        <i class="fa fa-download" aria-hidden="true"></i>
+        <div>이곳에 사진 파일을 넣어주세요.</div>
+        <div id="notimage" class="hidden">Pleaese select an image</div>
+        <span id="file-upload-btn" class="btn btn-primary">파일 불러오기</span>
+      </div>
+      <div id="response" class="hidden">
+        <div id="messages"></div>
+        <progress class="progress" id="file-progress" value="0">
+          <span>0</span>%
+        </progress>
+      </div>
+    </label>
+  </form>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script type="text/javascript">
+    // More API functions here:
+    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+
+    // the link to your model provided by Teachable Machine export panel
+    const URL = "https://teachablemachine.withgoogle.com/models/rGmGeAHn7/";
+
+    let model, webcam, labelContainer, maxPredictions, div, name_class, bar_class;
+
+    // Load the image model and setup the webcam
+    async function init() {
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+
+      // load the model and metadata
+      // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+      // or files from your local hard drive
+      // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+
+      labelContainer = document.getElementById("label-container");
+      for (let i = 0; i < 4; i++) { // and class labels
+        labelContainer.appendChild(document.createElement('div'));
+      }
+    }
+
+    // run the webcam image through the image model
+    async function predict() {
+      // predict can take in an image, video or canvas html element
+      var image = document.getElementById("file-image")
+      const prediction = await model.predict(image, false);
+      prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
+
+      for (let i = 0; i < 4; i++) {
+        barWidth = Math.round(prediction[i].probability.toFixed(2) * 100) + '%';
+        // const classPrediction =
+        //     prediction[i].className + ": " + prediction[i].probability.toFixed(2) * 100 + "%";
+        // labelContainer.childNodes[i].innerHTML = classPrediction;
+        var labelTitle
+        switch (prediction[i].className) {
+          case "kuromi":
+            labelTitle = "쿠로미"
+            break;
+
+          case " judy":
+            labelTitle = "주디"
+            break;
+
+          case " ari":
+            labelTitle = "아리"
+            break;
+
+          case " moomin":
+            labelTitle = "무민"
+            break;
+
+          case " sawako":
+            labelTitle = "사와코"
+            break;
+
+          case "mymelody":
+            labelTitle = "마이멜로디"
+            break;
+
+          case "squirtle":
+            labelTitle = "꼬부기"
+            break;
+
+          case "maruko":
+            labelTitle = "마루코"
+            break;
+
+          case "jessi":
+            labelTitle = "제시"
+            break;
+
+          case " missbarney":
+            labelTitle = "미스바니"
+            break;
+
+          default:
+            labelTitle = "알수없음"
+        }
+        // $('.result-message').html();
+        var predicitonname = prediction[i].className.trim()
+        var label =
+          "<div class='animal-label d-flex align-items-center'>" +
+          labelTitle +
+          '</div>';
+        var bar =
+          "<div class='bar-container position-relative container'><div class='" +
+          predicitonname +
+          "-box'></div><div class='d-flex justify-content-center align-items-center " +
+          predicitonname +
+          "-bar' style='width: " +
+          barWidth +
+          "'><span class='d-block percent-text'>" +
+          Math.round(prediction[i].probability.toFixed(2) * 100) +
+          '%</span></div></div>';
+        labelContainer.childNodes[i].innerHTML = label + bar;
+      }
+    }
+  </script>
+  <script type="text/javascript" src="fileupload.js"></script>
+</body>
+<!-- Copyright (c) 2023 by Matt  (https://codepen.io/uixmat/pen/yadZXv)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. -->
+
+</html>
