@@ -40,9 +40,22 @@ p.title{
   margin-bottom: 12px; 
 }
 
-p.startname{
-  margin-left: 310px;
-  font-size: 25px;
+div.startname {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin-top: 25px;
+  margin-bottom: 20px;
+}
+
+div.item p{
+  text-align: center;
+  font-size: 30px;
+}
+
+div.item{
+  display: flex;
+  flex-direction: column;
 }
 
 body {

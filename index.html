@@ -15,23 +15,49 @@
   <!-- <button type="button" onclick="init()">Start</button> -->
   <h2>AI가 알려주는, 나와 닮은 캐릭터는?</h2>
   <p class="title">원여고 코데(CO;DE)동아리 과학 체험 부스</p>
-  <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 20px">
-    <img src="startimg/judy.jpeg" style="width:130px; height:130px">
-    <img src="startimg/sawako.jpeg" style="width:130px; height:130px">
-    <img src="startimg/squirtle.png" style="width:130px; height:130px">
-    <img src="startimg/jessi.png" style="width:130px; height:130px">
-    <img src="startimg/mymelody.png" style="width:130px; height:130px">
-    <img src="startimg/kuromi.png" style="width:130px; height:130px">
-    <img src="startimg/moomin.png" style="width:130px; height:130px">
-    <img src="startimg/misbarney.jpeg" style="width:130px; height:130px">
-    <img src="startimg/maruko.png" style="width:130px; height:130px">
-    <img src="startimg/ari.jpeg" style="width:130px; height:130px">
+
+  <div class="startname">
+    <div class="item">
+      <img src="startimg/judy.jpeg" style="width:130px; height:130px">
+      <p>주 디</p>
+    </div>
+    <div class="item">
+      <img src="startimg/sawako.jpeg" style="width:130px; height:130px">
+      <p>사와코</p>
+    </div>
+    <div class="item">
+      <img src="startimg/squirtle.png" style="width:130px; height:130px">
+      <p>꼬북이</p>
+    </div>
+    <div class="item">
+      <img src="startimg/jessi.png" style="width:130px; height:130px">
+      <p>제 시</p>
+    </div>
+    <div class="item">
+      <img src="startimg/mymelody.png" style="width:130px; height:130px">
+      <p>마이멜로디</p>
+    </div>
+    <div class="item">
+      <img src="startimg/kuromi.png" style="width:130px; height:130px">
+      <p>쿠로미</p>
+    </div>
+    <div class="item">
+      <img src="startimg/moomin.png" style="width:130px; height:130px">
+      <p>무 민</p>
+    </div>
+    <div class="item">
+      <img src="startimg/misbarney.jpeg" style="width:130px; height:130px">
+      <p>미스바니</p>
+    </div>
+    <div class="item">
+      <img src="startimg/maruko.png" style="width:130px; height:130px">
+      <p>마루코</p>
+    </div>
+    <div class="item">
+      <img src="startimg/ari.jpeg" style="width:130px; height:130px">
+      <p>아 리</p>
+    </div>
   </div>
-  <p class="startname">주 디 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;사와코 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;꼬북이 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;제 시 &nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;마이멜로디 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;쿠로미 &nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;무 민 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;미스바니 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;마루코 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;아 리</p>
 
   <!-- Upload  -->
   <form id="file-upload-form" class="uploader">
@@ -63,110 +89,7 @@
   </form>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-  <script type="text/javascript">
-    // More API functions here:
-    // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
-
-    // the link to your model provided by Teachable Machine export panel
-    const URL = "https://teachablemachine.withgoogle.com/models/rGmGeAHn7/";
-
-    let model, webcam, labelContainer, maxPredictions, div, name_class, bar_class;
-
-    // Load the image model and setup the webcam
-    async function init() {
-      const modelURL = URL + "model.json";
-      const metadataURL = URL + "metadata.json";
-
-      // load the model and metadata
-      // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
-      // or files from your local hard drive
-      // Note: the pose library adds "tmImage" object to your window (window.tmImage)
-      model = await tmImage.load(modelURL, metadataURL);
-      maxPredictions = model.getTotalClasses();
-
-      labelContainer = document.getElementById("label-container");
-      for (let i = 0; i < 4; i++) { // and class labels
-        labelContainer.appendChild(document.createElement('div'));
-      }
-    }
-
-    // run the webcam image through the image model
-    async function predict() {
-      // predict can take in an image, video or canvas html element
-      var image = document.getElementById("file-image")
-      const prediction = await model.predict(image, false);
-      prediction.sort((a, b) => parseFloat(b.probability) - parseFloat(a.probability));
-
-      for (let i = 0; i < 4; i++) {
-        barWidth = Math.round(prediction[i].probability.toFixed(2) * 100) + '%';
-        // const classPrediction =
-        //     prediction[i].className + ": " + prediction[i].probability.toFixed(2) * 100 + "%";
-        // labelContainer.childNodes[i].innerHTML = classPrediction;
-        var labelTitle
-        switch (prediction[i].className) {
-          case "kuromi":
-            labelTitle = "쿠로미"
-            break;
-
-          case " judy":
-            labelTitle = "주디"
-            break;
-
-          case " ari":
-            labelTitle = "아리"
-            break;
-
-          case " moomin":
-            labelTitle = "무민"
-            break;
-
-          case " sawako":
-            labelTitle = "사와코"
-            break;
-
-          case "mymelody":
-            labelTitle = "마이멜로디"
-            break;
-
-          case "squirtle":
-            labelTitle = "꼬부기"
-            break;
-
-          case "maruko":
-            labelTitle = "마루코"
-            break;
-
-          case "jessi":
-            labelTitle = "제시"
-            break;
-
-          case " missbarney":
-            labelTitle = "미스바니"
-            break;
-
-          default:
-            labelTitle = "알수없음"
-        }
-        // $('.result-message').html();
-        var predicitonname = prediction[i].className.trim()
-        var label =
-          "<div class='animal-label d-flex align-items-center'>" +
-          labelTitle +
-          '</div>';
-        var bar =
-          "<div class='bar-container position-relative container'><div class='" +
-          predicitonname +
-          "-box'></div><div class='d-flex justify-content-center align-items-center " +
-          predicitonname +
-          "-bar' style='width: " +
-          barWidth +
-          "'><span class='d-block percent-text'>" +
-          Math.round(prediction[i].probability.toFixed(2) * 100) +
-          '%</span></div></div>';
-        labelContainer.childNodes[i].innerHTML = label + bar;
-      }
-    }
-  </script>
+  <script src="api.js"></script>
   <script type="text/javascript" src="fileupload.js"></script>
 </body>
 <!-- Copyright (c) 2023 by Matt  (https://codepen.io/uixmat/pen/yadZXv)
